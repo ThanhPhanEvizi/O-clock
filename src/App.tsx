@@ -69,16 +69,29 @@ function formatTime(time: number) {
 }
 
 function convertingMilliseconds(milliseconds: number) {
-  const seconds = milliseconds % 60;
-  const minutes = Math.floor(milliseconds / 60) % 60;
-  const hours = Math.floor(milliseconds / 3600);
-  return { minutes: minutes, seconds: seconds, hours: hours };
+  const milliSecond = Math.floor(milliseconds % 60);
+  const seconds = Math.floor((milliseconds / 100) % 60); // 1s second -> milliSecond * 1000
+  const minutes = Math.floor((milliseconds / 60000) % 60);
+  const hours = Math.floor(minutes / 60) % 24;
+  return {
+    minutes: minutes,
+    seconds: seconds,
+    hours: hours,
+    milliSecond: milliSecond,
+  };
 }
 
 function convertingMillisecondsToTime(milliseconds: number) {
-  const { minutes, seconds, hours } = convertingMilliseconds(milliseconds);
+  const { minutes, seconds, hours, milliSecond } =
+    convertingMilliseconds(milliseconds);
   return (
-    formatTime(hours) + ":" + formatTime(minutes) + ":" + formatTime(seconds)
+    formatTime(hours) +
+    ":" +
+    formatTime(minutes) +
+    ":" +
+    formatTime(seconds) +
+    ":" +
+    formatTime(milliSecond)
   );
 }
 
@@ -130,32 +143,39 @@ const StopwatchData = ({ dataTimeList }: { dataTimeList: DataTimeProps[] }) => {
 };
 
 const TimeCounter = ({ time }: { time: number }) => {
-  const { hours, minutes, seconds } = convertingMilliseconds(time);
+  const { hours, minutes, seconds, milliSecond } = convertingMilliseconds(time);
   return (
-    <Row
-      sx={{
-        alignItems: "center",
-        margin: "20px 0px",
-        "& .MuiTypography-root": {
-          fontSize: "8rem",
-        },
-      }}
-    >
-      <BoxStyle>
-        <Typography>{formatTime(hours)}</Typography>
-      </BoxStyle>
-      <Box sx={{ margin: "0px 10px" }}>
-        <Typography>:</Typography>
+    <Row sx={{ margin: "20px 0px", alignItems: "flex-end" }}>
+      <Row
+        sx={{
+          alignItems: "center",
+
+          "& .MuiTypography-root": {
+            fontSize: "8rem",
+          },
+        }}
+      >
+        <BoxStyle>
+          <Typography>{formatTime(hours)}</Typography>
+        </BoxStyle>
+        <Box sx={{ margin: "0px 10px" }}>
+          <Typography>:</Typography>
+        </Box>
+        <BoxStyle>
+          <Typography>{formatTime(minutes)}</Typography>
+        </BoxStyle>
+        <Box sx={{ margin: "0px 10px" }}>
+          <Typography>:</Typography>
+        </Box>
+        <BoxStyle>
+          <Typography>{formatTime(seconds)}</Typography>
+        </BoxStyle>
+      </Row>
+      <Box>
+        <Typography sx={{ fontSize: "3rem", minWidth: "80px" }}>
+          {formatTime(milliSecond)}
+        </Typography>
       </Box>
-      <BoxStyle>
-        <Typography>{formatTime(minutes)}</Typography>
-      </BoxStyle>
-      <Box sx={{ margin: "0px 10px" }}>
-        <Typography>:</Typography>
-      </Box>
-      <BoxStyle>
-        <Typography>{formatTime(seconds)}</Typography>
-      </BoxStyle>
     </Row>
   );
 };
@@ -170,7 +190,7 @@ function App() {
     if (isStart && !isPause) {
       const interval = setInterval(() => {
         setTimer((timer) => timer + 1);
-      }, 1000);
+      }, 10);
       return () => clearInterval(interval);
     }
   }, [isPause, isStart]);
