@@ -11,12 +11,11 @@ import { TransitionGroup } from "react-transition-group";
 import moment from "moment";
 
 interface ButtonProps extends ButtonBaseProps {
-  sx?: any;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
 }
 
 interface DataTimeProps {
-  presentTime?: string;
+  presentTime: string;
   time: number;
 }
 
@@ -83,7 +82,7 @@ function convertingMillisecondsToTime(milliseconds: number) {
   );
 }
 
-const StopwatchData = ({ dataTime }: { dataTime: any }) => {
+const StopwatchData = ({ dataTimeList }: { dataTimeList: DataTimeProps[] }) => {
   return (
     <Col
       sx={{
@@ -106,7 +105,7 @@ const StopwatchData = ({ dataTime }: { dataTime: any }) => {
         </Grid>
       </Grid>
       <TransitionGroup>
-        {dataTime.map((data: DataTimeProps, index: number) => {
+        {dataTimeList.map((dataTime: DataTimeProps, index: number) => {
           return (
             <Collapse>
               <Grid container columns={13} sx={{ padding: "2px 0px" }}>
@@ -115,11 +114,11 @@ const StopwatchData = ({ dataTime }: { dataTime: any }) => {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography>
-                    {convertingMillisecondsToTime(data.time)}
+                    {convertingMillisecondsToTime(dataTime.time)}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography>{data.presentTime}</Typography>
+                  <Typography>{dataTime.presentTime}</Typography>
                 </Grid>
               </Grid>
             </Collapse>
@@ -165,7 +164,7 @@ function App() {
   const [isStart, setIsStart] = useState<boolean>(false);
   const [isPause, setIsPause] = useState<boolean>(false);
   const [timer, setTimer] = useState(0);
-  const [dataTime, setTime] = useState<DataTimeProps[]>([]);
+  const [dataTimeList, setTime] = useState<DataTimeProps[]>([]);
 
   useEffect(() => {
     if (isStart && !isPause) {
@@ -294,9 +293,9 @@ function App() {
             )}
           </Row>
 
-          {!!dataTime.length && (
+          {!!dataTimeList.length && (
             <>
-              <StopwatchData dataTime={dataTime} />
+              <StopwatchData dataTimeList={dataTimeList} />
               <ButtonStyle onClick={handleClearData} sx={{ marginTop: "10px" }}>
                 Clear Data
               </ButtonStyle>
